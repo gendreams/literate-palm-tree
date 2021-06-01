@@ -1,97 +1,144 @@
-/*
-  1. Store correct answers
-   - When quiz begins, no answers are correct
-*/
-
-let correct = 0;
-
-let solutions = '';
-
-let q1 = prompt('How do you use querySelector?');
-let q1Answer = '#1 is incorrect. It should equal "assigning to the document object."<br>';
-
-let q2 = prompt('How do you change a string variable to a number?');
-let q2Answer = '#2 is incorrect. It should equal "+variable."<br>';
-
-let q3 = prompt('When should we use const as a variable?');
-let q3Answer = '#3 is incorrect. It should equal "When the variable will not change."<br>';
-
-let q4 = prompt('At what price should you buy Tesla stock again?');
-let q4Answer = '#4 is incorrect. It should equal "$450."<br>';
-
-let q5 = prompt('How much will the web development industry grow in the next 10 years?');
-let q5Answer = '#5 is incorrect. It should equal "20 percent."<br>';
+// Correct Order of Execution
+// 1. Functions
+// 2. Variables
+// 3. Kick Off
+// 4. Event Listeners
 
 
-if ( q1 === 'assigning to the document object' ) {
-    correct += 1;
-} else {
-    solutions += `${q1Answer}`;
+function buildQuiz() {
+    // variable to store the HTML output
+    const output = [];
+
+    // for each question...
+    myQuestions.forEach(
+        (currentQuestion, questionNumber) => {
+
+            // variable to store the list of possible answers
+            const answers = [];
+
+            // and for each available answer...
+            for(letter in currentQuestion.answers){
+
+                // ...add an HTML radio button
+                answers.push(
+                    `<label>
+            <input type="radio" name="question${questionNumber}" value="${letter}">
+            ${letter} :
+            ${currentQuestion.answers[letter]}
+          </label>`
+                );
+            }
+
+            // add this question and its answers to the output
+            output.push(
+                `<div class="question"> ${currentQuestion.question} </div>
+        <div class="answers"> ${answers.join('')} </div>`
+            );
+        }
+    );
+
+    // finally combine our output list into one string of HTML and put it on the page
+    quizContainer.innerHTML = output.join('');
 }
 
-if ( q2 === '+variable' ) {
-    correct += 1;
-} else {
-    solutions += `${q2Answer}`;
+function showResults() {
+    // Steps - loop over answers, check them, show results
+    // gather answer containers from our quiz
+    const answerContainers = quizContainer.querySelectorAll('.answers');
+    // keep track of the users answers
+    let numCorrect = 0;
+    // for each question
+    myQuestions.forEach((currentQuestion, questionNumber) => {
+        // find selected answer
+          // look inside the container for the current question
+        const answerContainer = answerContainers[questionNumber];
+          // define a CSS selector to help find which radio button is checked
+        const selector = `input[name=question${questionNumber}]:checked`;
+          // use a querySelector to search for our CSS selector in the previously defined answerContainer -
+            // i.e find which answer's radio button is checked
+        const userAnswer = (answerContainer.querySelector(selector) || {}).value; // get the value of the answer
+          // if there is no answer selected, use an empty object - This allows the user to skip a question without crashing the quiz
+
+        // if answer is correct
+        if (userAnswer === currentQuestion.correctAnswer) {
+            // add to the number of correct answers
+            numCorrect++;
+            // color it green
+            answerContainers[questionNumber].style.color = 'lightgreen';
+        }
+        // if the answer is wrong or blank
+        else {
+            // color it red
+            answerContainers[questionNumber].style.color = 'red';
+        }
+    });
+
+    // show the number of correct answers out of the total
+    resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
+
 }
 
-if ( q3 === 'When the variable will not change' ) {
-    correct += 1;
-} else {
-    solutions += `${q3Answer}`;
-}
+const quizContainer = document.getElementById('quiz');
+const resultsContainer = document.getElementById('results');
+const submitButton = document.getElementById('Check Answers');
 
-if ( q4 === '$450' ) {
-    correct += 1;
-} else {
-    solutions += `${q4Answer}`;
-}
+const myQuestions = [
+    {
+        question: "How do you use querySelector?",
+        answers: {
+            a: "select the document object",
+            b: "use innerHTML",
+            c: "Select each query"
+        },
+        correctAnswer: "a"
+    },
+    {
+        question: "How do you change a string variable to a number?",
+        answers: {
+            a: "string.ToNumber()",
+            b: "+",
+            c: "number.ToString()"
+        },
+        correctAnswer: "b"
+    },
+    {
+        question: "When should we use const as a variable?",
+        answers: {
+            a: "all the time",
+            b: "sometimes",
+            c: "When the variable needs to change often",
+            d: "When the variable will not change"
+        },
+        correctAnswer: "d"
+    },
+    {
+        question: "At what price should you buy Tesla stock again?",
+        answers: {
+            a: "Elon is crazy AF",
+            b: "$450",
+            c: "$550",
+            d: "$850"
+        },
+        correctAnswer: "b"
+    },
+    {
+        question: "How much will the web development industry grow in the next 10 years?",
+        answers: {
+            a: "5%",
+            b: "8%",
+            c: "Your mom",
+            d: "not at all"
+        },
+        correctAnswer: "d"
+    }
+];
 
-if ( q5 === '20 percent' ) {
-    correct += 1;
-} else {
-    solutions += `${q5Answer}`;
-}
-
-// 2. Store the rank of a player
-
-// 3. Select the <main> HTML element
-
-/*
-  4. Ask at least 5 questions
-   - Store each answer in a variable
-   - Keep track of the number of correct answers
-*/
 
 
+// display quiz immediately
 
-/*
-  5. Rank player based on number of correct answers
-   - 5 correct = Gold
-   - 3-4 correct = Silver
-   - 1-2 correct = Bronze
-   - 0 correct = No crown
-*/
+buildQuiz();
 
+// on submit, show results
 
-let rank;
-let wisdomWords;
-
-if ( correct === 5 ) {
-    rank = 'Gold';
-    wisdomWords = 'Congrats! You\'re a badass';
-} else if ( correct === 3 || correct === 4 ) {
-    rank = 'Silver';
-    wisdomWords = 'Nice work! You\'re slightly above average';
-} else if ( correct === 1 || correct === 2 ) {
-    rank = 'Bronze';
-    wisdomWords = 'Well, you\'re completely average';
-} else if ( correct === 0 ) {
-    rank = 'No crown';
-    wisdomWords = 'Start studying mofo';
-}
-
-
-// 6. Output results to the <main> element
-
-document.querySelector('main').innerHTML = `<p>${rank} <br> ${wisdomWords} <br> ${solutions}</p>`;
+submitButton.addEventListener('click', showResults);
